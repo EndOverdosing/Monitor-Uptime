@@ -43,8 +43,6 @@ body.light-theme {
 html { scroll-behavior: smooth; }
 body {
     background-color: var(--background-color-page);
-    background-image: linear-gradient(to right, var(--border-color-subtle) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color-subtle) 1px, transparent 1px);
-    background-size: 60px 60px;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     display: flex; justify-content: center; align-items: flex-start;
@@ -55,17 +53,17 @@ body::before, body::after { content: ""; position: fixed; left: 0; right: 0; poi
 body::before { top: 0; bottom: 0; background: linear-gradient(to bottom, var(--gradient-start) 0%, var(--gradient-middle) 40%, var(--gradient-end) 70%); z-index: 1; }
 body::after {
     content: ""; top: 0; bottom: 0;
-    background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), hsla(0, 0%, 100%, 0.363) 50px, hsla(0, 0%, 100%, 0.125) 150px, transparent 300px);
+    background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), hsla(0, 0%, 100%, 0.3) 50px, hsla(0, 0%, 100%, 0.1) 150px, transparent 300px), var(--border-color-subtle);
     mask-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px);
     -webkit-mask-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px);
     mask-size: 60px 60px; -webkit-mask-size: 60px 60px;
     mask-position: center; -webkit-mask-position: center;
-    opacity: var(--cursor-opacity, 0);
+    opacity: var(--cursor-opacity, 0.5);
     transition: opacity 0.3s ease-out;
     z-index: 0;
 }
 body.light-theme::after {
-    background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), rgba(0, 0, 0, 0.15) 50px, rgba(0, 0, 0, 0.2) 150px, transparent 300px);
+    background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), rgba(0, 0, 0, 0.15) 50px, rgba(0, 0, 0, 0.05) 150px, transparent 300px), var(--border-color-subtle);
 }
 .theme-switcher {
     position: fixed; top: 20px; right: 20px; width: 44px; height: 44px;
