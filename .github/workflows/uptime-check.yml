@@ -1,0 +1,14 @@
+name: Uptime Check
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  uptime-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger uptime check
+        run: |
+          curl -f -X POST "https://uptime-monitor-web.onrender.com/run-check/${{ secrets.CHECKER_SECRET_TOKEN }}" || echo "Check failed"

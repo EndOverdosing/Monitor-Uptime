@@ -18,17 +18,3 @@ services:
         value: 3.11.9
       - key: CHECKER_SECRET_TOKEN
         generateValue: true
-
-  - type: cron
-    name: uptime-checker-cron
-    runtime: node
-    schedule: "*/5 * * * *"
-    startCommand: "curl -X POST ${WEB_SERVICE_URL}/run-check/${CHECKER_SECRET_TOKEN}"
-    envVars:
-      - key: WEB_SERVICE_URL
-        value: "https://uptime-monitor-web.onrender.com"
-      - key: CHECKER_SECRET_TOKEN
-        fromService:
-          type: web
-          name: uptime-monitor-web
-          envVarKey: CHECKER_SECRET_TOKEN
