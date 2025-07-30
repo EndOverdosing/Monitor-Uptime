@@ -10,8 +10,9 @@ from sqlalchemy.orm import Session
 from pydantic import HttpUrl
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import crud, models
-from .database import engine, get_db, SessionLocal
+import crud
+import models
+from database import engine, get_db, SessionLocal
 
 models.Base.metadata.create_all(bind=engine)
 
