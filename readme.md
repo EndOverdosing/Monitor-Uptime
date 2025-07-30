@@ -1,3 +1,5 @@
+![Uptime Monitor Logo](/static/images/github-banner.png)
+
 # Uptime Monitor
 
 A sleek, simple, and free tool to keep an eye on your web services, built with FastAPI and deployable in minutes on Render.
@@ -8,7 +10,7 @@ A sleek, simple, and free tool to keep an eye on your web services, built with F
 - **Real-time Status**: Shows uptime/downtime counts and the latest HTTP status code.
 - **Detailed Logs**: View a history of checks for each URL with timestamps, status codes, and response times.
 - **IP-Based Ownership**: Users can only add one URL and can only delete the URL they added.
-- **Automatic Checks**: A background cron job automatically checks all monitored URLs every 5 minutes.
+- **Automatic Checks**: GitHub Actions automatically checks all monitored URLs every 5 minutes.
 - **Easy Deployment**: Deployable to Render with a single `render.yaml` file.
 - **Light/Dark Mode**: Switch themes to your preference.
 
@@ -19,10 +21,13 @@ A sleek, simple, and free tool to keep an eye on your web services, built with F
 - **Frontend**: Jinja2 Templates, CSS, JavaScript
 - **HTTP Client**: HTTPX
 - **Deployment**: Render
+- **Automation**: GitHub Actions
 
 ## Deployment on Render
 
-This project is configured for easy deployment on [Render](https://render.com/) using a "Blueprint" configuration.
+This project is configured for easy deployment on [Render](https://render.com/) using a "Blueprint" configuration with GitHub Actions for automated checks.
+
+### Step 1: Fork and Deploy
 
 1.  **Fork this Repository**: Click the 'Fork' button at the top-right of this page to create a copy of this repository in your GitHub account.
 
@@ -34,15 +39,30 @@ This project is configured for easy deployment on [Render](https://render.com/) 
 
 3.  **Approve the Plan**:
     *   Render will create a PostgreSQL database and a Web Service for the application.
-    *   It will also create a **Cron Job** responsible for triggering the checks.
     *   Click **Approve** to build and deploy the services.
 
-4.  **IMPORTANT: Configure the Cron Job**:
-    *   Once the initial deployment is complete, your `uptime-monitor-web` service will have a public URL (e.g., `https://your-app-name.onrender.com`).
-    *   Go to the dashboard for your new services.
-    *   Navigate to the **Environment** tab of the `uptime-checker-cron` service.
-    *   You will see an environment variable named `WEB_SERVICE_URL`. **You must edit this variable** and replace the placeholder value (`https://YOUR_APP_NAME.onrender.com`) with the actual public URL of your `uptime-monitor-web` service.
-    *   Save the changes. The cron job will now be able to successfully trigger the checks every 5 minutes.
+### Step 2: Configure GitHub Actions for Automated Checks
+
+Since Render's cron jobs require a paid plan, this project uses GitHub Actions (completely free) to trigger the uptime checks every 5 minutes.
+
+1. **Get your Secret Token**:
+   - After deployment, go to your Render dashboard
+   - Navigate to your `uptime-monitor-web` service
+   - Go to the **Environment** tab
+   - Copy the value of `CHECKER_SECRET_TOKEN`
+
+2. **Add GitHub Secret**:
+   - In your forked GitHub repository, go to **Settings** → **Secrets and variables** → **Actions**
+   - Click **New repository secret**
+   - Name: `CHECKER_SECRET_TOKEN`
+   - Value: paste the token from Render
+   - Click **Add secret**
+
+3. **Verify GitHub Actions**:
+   - The `.github/workflows/uptime-check.yml` file is already included in the repository
+   - Go to the **Actions** tab in your GitHub repository
+   - You should see the "Uptime Check" workflow running every 5 minutes
+   - You can also manually trigger it for testing
 
 ## How It Works
 
@@ -53,5 +73,48 @@ This project is configured for easy deployment on [Render](https://render.com/) 
 
 ### Uptime Checking
 - The core checking logic is an async function that sends an HTTP GET request to a URL. It records the status code, response time, and any errors.
-- This logic is not running constantly. It is triggered by sending a `POST` request to the `/run-check/{secret_token}` endpoint.
-- The **Cron Job** (`uptime-checker-cron`) service you configured on Render is responsible for sending this `POST` request automatically every 5 minutes, ensuring your monitored URLs are checked consistently. Without this cron job, no checks will ever run.
+- This logic is triggered by sending a `POST` request to the `/run-check/{secret_token}` endpoint.
+- **GitHub Actions** automatically sends this `POST` request every 5 minutes using the workflow defined in `.github/workflows/uptime-check.yml`, ensuring your monitored URLs are checked consistently.
+- The secret token prevents unauthorized access to the check endpoint.
+
+## Local Development
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/uptime-monitor.git
+   cd uptime-monitor
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Set environment variables:
+   ```bash
+   export DATABASE_URL="sqlite:///./test.db"
+   export CHECKER_SECRET_TOKEN="your-secret-token"
+   ```
+
+4. Run the application:
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+5. Visit `http://localhost:8000` to use the application.
+
+## Configuration
+
+The application uses these environment variables:
+
+- `DATABASE_URL`: PostgreSQL connection string (automatically set by Render)
+- `CHECKER_SECRET_TOKEN`: Secret token for triggering checks (automatically generated by Render)
+- `PORT`: Port number for the web service (automatically set by Render)
+
+## Contributing
+
+Feel free to open issues or submit pull requests to improve the application!
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).

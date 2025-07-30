@@ -1,12 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uptime Monitor</title>
+
+    <link rel="icon" href="{{ url_for('static', path='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+
+    <meta name="description" content="Track website uptime and monitor status easily with this uptime monitoring tool.">
+    <meta property="og:title" content="Uptime Monitor">
+    <meta property="og:description"
+        content="Track website uptime and monitor status easily with this uptime monitoring tool.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://uptime-monitor-web.onrender.com">
+    <meta property="og:image" content="{{ url_for('static', path='images/banner.png') }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Uptime Monitor">
+    <meta name="twitter:description"
+        content="Track website uptime and monitor status easily with this uptime monitoring tool.">
+    <meta name="twitter:image" content="{{ url_for('static', path='images/banner.png') }}">
 </head>
+
+
 <body>
     <div id="theme-switcher" class="theme-switcher" title="Toggle Theme">
         <i class="fas fa-sun sun-icon"></i>
@@ -23,4 +41,5 @@
 
     <script src="{{ url_for('static', path='/script.js') }}"></script>
 </body>
+
 </html>
