@@ -20,26 +20,25 @@ def create_url(db: Session, url: str, ip: str):
     db.refresh(db_url)
     return db_url
 
+def delete_url_by_id_and_ip(db: Session, url_id: int, ip: str):
+    db_url = db.query(models.URL).filter(models.URL.id == url_id, models.URL.submitted_by_ip == ip).first()
+    if db_url:
+        db.delete(db_url)
+        db.commit()
+        return db_url
+    return None
+
 def create_log_and_update_stats(db: Session, url_id: int, is_up: bool, status_code: int = None, response_time: float = None, error: str = None):
     db_url = db.query(models.URL).filter(models.URL.id == url_id).with_for_update().first()
     if not db_url:
         return
-
-    db_log = models.Log(
-        url_id=url_id,
-        is_up=is_up,
-        status_code=status_code,
-        response_time_ms=response_time,
-        error_message=error,
-    )
+    db_log = models.Log(url_id=url_id, is_up=is_up, status_code=status_code, response_time_ms=response_time, error_message=error)
     db.add(db_log)
-
     db_url.last_status_code = status_code
     if is_up:
         db_url.uptime_count += 1
     else:
         db_url.downtime_count += 1
-    
     db.commit()
 
 def get_logs_for_url(db: Session, url_id: int, limit: int = 100):
