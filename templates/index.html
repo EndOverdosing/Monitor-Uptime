@@ -13,7 +13,7 @@
 <div class="flash-message flash-error">{{ flash_error }}</div>
 {% endif %}
 
-<div class="url-form-container interactive-glass">
+<div class="url-form-container interactive-border">
     <form action="/submit-url" method="post" class="url-form">
         <input type="text" name="url" id="url-input" placeholder="https://example.com" required>
         <button type="submit" id="submit-button" aria-label="Monitor URL">
@@ -25,7 +25,7 @@
 <div class="url-list-container">
     {% if urls %}
         {% for url in urls %}
-        <div class="url-card interactive-glass">
+        <div class="url-card interactive-border">
             <div class="url-card-header">
                 <div class="url-link-wrapper">
                     <a href="{{ url.url }}" target="_blank" rel="noopener noreferrer" class="url-link">{{ url.url }}</a>
@@ -61,7 +61,7 @@
         </div>
         {% endfor %}
     {% else %}
-        <div class="empty-state interactive-glass">
+        <div class="empty-state interactive-border">
             <p>No URLs are being monitored. Add one above to get started!</p>
         </div>
     {% endif %}
