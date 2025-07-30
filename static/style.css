@@ -56,9 +56,9 @@ body {
     -webkit-font-smoothing: antialiased;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
-    padding: 2rem 1rem;
+    padding: 4rem 1rem;
     overflow-x: hidden;
     transition: background-color 0.4s ease;
 }
@@ -137,7 +137,7 @@ body.light-theme .interactive-border::before { background: radial-gradient(250px
 #submit-button { display: flex; align-items: center; justify-content: center; height: 48px; width: 48px; background-color: var(--button-primary-bg); color: var(--button-primary-text); border: none; border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: var(--transition-std); flex-shrink: 0; }
 #submit-button:hover:not(:disabled) { transform: scale(1.1); }
 
-.flash-message { padding: 1.25rem 1.75rem; border-radius: var(--border-radius-soft); font-weight: 500; animation: fade-in-up 0.5s ease-out both; text-align: center; }
+.flash-message { position: relative; z-index: 5; padding: 1.25rem 1.75rem; border-radius: var(--border-radius-soft); font-weight: 500; animation: fade-in-up 0.5s ease-out both; text-align: center; }
 .flash-success { background-color: rgba(80, 250, 123, 0.1); border: 1px solid rgba(80, 250, 123, 0.2); color: var(--success-color); }
 .flash-error { background-color: rgba(255, 85, 85, 0.1); border: 1px solid rgba(255, 85, 85, 0.2); color: var(--error-color); }
 
@@ -181,7 +181,7 @@ body.light-theme .logs-table th { background-color: rgba(0, 0, 0, 0.03); }
 .logs-table .status-text-down { color: var(--error-color); font-weight: var(--font-weight-semibold); }
 
 @media (max-width: 640px) {
-    body { align-items: flex-start; padding-top: 6rem; }
+    body { padding-top: 6rem; }
     .url-card-stats { grid-template-columns: 1fr; gap: 0.75rem; }
     .logs-table thead { display: none; }
     .logs-table tr { display: block; margin-bottom: 1rem; border-radius: var(--border-radius-soft); background-color: var(--glass-base-bg); border: 1px solid var(--border-color-subtle); padding: 1rem; }
