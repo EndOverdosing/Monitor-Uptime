@@ -15,6 +15,6 @@ services:
           name: uptime-db
           property: connectionString
       - key: PYTHON_VERSION
-        value: 3.11
+        value: 3.11.9
       - key: CHECKER_SECRET_TOKEN
         generateValue: true
