@@ -1,8 +1,8 @@
-services:
-  - type: postgres
-    name: uptime-db
+databases:
+  - name: uptime-db
     plan: free
 
+services:
   - type: web
     name: uptime-monitor-web
     env: python
@@ -11,8 +11,7 @@ services:
     startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
-        fromService:
-          type: postgres
+        fromDatabase:
           name: uptime-db
           property: connectionString
       - key: PYTHON_VERSION
@@ -27,8 +26,7 @@ services:
     startCommand: "python checker.py"
     envVars:
       - key: DATABASE_URL
-        fromService:
-          type: postgres
+        fromDatabase:
           name: uptime-db
           property: connectionString
       - key: PYTHON_VERSION
