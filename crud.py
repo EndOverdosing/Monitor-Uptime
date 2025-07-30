@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from . import models
+import models
 
 def get_url_by_ip(db: Session, ip: str):
     return db.query(models.URL).filter(models.URL.submitted_by_ip == ip).first()
