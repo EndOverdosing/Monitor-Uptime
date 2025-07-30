@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<header class="hero-header">
+    <h1>Uptime Monitor</h1>
+    <p class="subtitle">Keep an eye on your web services, effortlessly.</p>
+</header>
+
+{% if flash_message %}
+<div class="flash-message flash-success">{{ flash_message }}</div>
+{% endif %}
+{% if flash_error %}
+<div class="flash-message flash-error">{{ flash_error }}</div>
+{% endif %}
+
+<div class="url-form-container interactive-border" style="border-radius: var(--border-radius-pill);">
+    <form action="/submit-url" method="post" class="url-form">
+        <i class="fas fa-link form-icon"></i>
+        <input type="text" name="url" id="url-input" placeholder="https://example.com" required>
+        <button type="submit" id="submit-button" aria-label="Monitor URL">
+            <i class="fas fa-plus"></i>
+        </button>
+    </form>
+</div>
+
+<div class="url-list-container">
+    {% if urls %}
+        {% for url in urls %}
+        <div class="url-card interactive-border">
+            <div class="url-card-header">
+                <a href="{{ url.url }}" target="_blank" rel="noopener noreferrer" class="url-link">{{ url.url }}</a>
+                {% if url.last_status_code %}
+                    {% if url.last_status_code >= 200 and url.last_status_code < 400 %}
+                        <span class="status-badge status-ok">{{ url.last_status_code }}</span>
+                    {% else %}
+                        <span class="status-badge status-error">{{ url.last_status_code }}</span>
+                    {% endif %}
+                {% else %}
+                    <span class="status-badge status-unknown">Pending</span>
+                {% endif %}
+            </div>
+            <div class="url-card-stats">
+                <div class="stat-item">
+                    <strong>Uptime:</strong> <span class="uptime">{{ url.uptime_count }} checks</span>
+                </div>
+                <div class="stat-item">
+                    <strong>Downtime:</strong> <span class="downtime">{{ url.downtime_count }} checks</span>
+                </div>
+            </div>
+            <div class="url-card-footer">
+                <span>Last checked: {{ url.last_checked_at.strftime('%Y-%m-%d %H:%M') if url.last_checked_at else 'Never' }}</span>
+                <a href="{{ url_for('read_url_details', url_id=url.id) }}" class="details-link">View Logs →</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state interactive-border">
+            <p>No URLs are being monitored yet. Add one above to get started!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
