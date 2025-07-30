@@ -20,7 +20,7 @@ services:
   - type: cron
     name: uptime-monitor-checker
     env: python
-    plan: free
+    plan: starter
     schedule: "*/5 * * * *"
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python checker.py"
