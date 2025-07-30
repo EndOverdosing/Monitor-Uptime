@@ -1,56 +1,58 @@
 {% extends "base.html" %}
 
 {% block content %}
-<a href="/" class="back-link">← Back to Dashboard</a>
+<main class="main-content-wrapper">
+    <a href="/" class="back-link">← Back to Dashboard</a>
 
-<header class="details-header">
-    <p class="url-display">
-        <a href="{{ url.url }}" target="_blank" rel="noopener noreferrer">{{ url.url }}</a>
-    </p>
-</header>
+    <header class="details-header">
+        <p class="url-display">
+            <a href="{{ url.url }}" target="_blank" rel="noopener noreferrer">{{ url.url }}</a>
+        </p>
+    </header>
 
-<div class="logs-table-container interactive-border">
-    {% if logs %}
-    <table class="logs-table">
-        <thead>
-            <tr>
-                <th>Timestamp</th>
-                <th>Result</th>
-                <th>Status Code</th>
-                <th>Response (ms)</th>
-                <th>Error</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for log in logs %}
-            <tr>
-                <td data-label="Timestamp">{{ log.timestamp.strftime('%b %d, %Y %H:%M:%S') }}</td>
-                <td data-label="Result">
-                    {% if log.is_up %}
-                        <span class="status-text-up">UP</span>
-                    {% else %}
-                        <span class="status-text-down">DOWN</span>
-                    {% endif %}
-                </td>
-                <td data-label="Status Code">
-                    {% if log.status_code %}
-                        <span class="status-badge status-{{ 'ok' if log.status_code >= 200 and log.status_code < 400 else 'error' }}">
-                            {{ log.status_code }}
-                        </span>
-                    {% else %}
-                        N/A
-                    {% endif %}
-                </td>
-                <td data-label="Response Time">{{ "%.2f"|format(log.response_time_ms) if log.response_time_ms is not none else 'N/A' }}</td>
-                <td data-label="Error">{{ log.error_message or 'None' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <div class="empty-state">
-        <p>No logs recorded yet. The checker runs every 5 minutes.</p>
+    <div class="logs-table-container interactive-border">
+        {% if logs %}
+        <table class="logs-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Result</th>
+                    <th>Status Code</th>
+                    <th>Response (ms)</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td data-label="Timestamp">{{ log.timestamp.strftime('%b %d, %Y %H:%M:%S') }}</td>
+                    <td data-label="Result">
+                        {% if log.is_up %}
+                            <span class="status-text-up">UP</span>
+                        {% else %}
+                            <span class="status-text-down">DOWN</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Status Code">
+                        {% if log.status_code %}
+                            <span class="status-badge status-{{ 'ok' if log.status_code >= 200 and log.status_code < 400 else 'error' }}">
+                                {{ log.status_code }}
+                            </span>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td data-label="Response Time">{{ "%.2f"|format(log.response_time_ms) if log.response_time_ms is not none else 'N/A' }}</td>
+                    <td data-label="Error">{{ log.error_message or 'None' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state interactive-border">
+            <p>No logs recorded yet. The checker runs every 5 minutes.</p>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-</div>
+</main>
 {% endblock %}
