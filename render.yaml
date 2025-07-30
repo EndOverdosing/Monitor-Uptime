@@ -1,5 +1,5 @@
 services:
-  - type: psql
+  - type: postgres
     name: uptime-db
     plan: free
 
@@ -12,7 +12,7 @@ services:
     envVars:
       - key: DATABASE_URL
         fromService:
-          type: psql
+          type: postgres
           name: uptime-db
           property: connectionString
       - key: PYTHON_VERSION
@@ -28,7 +28,7 @@ services:
     envVars:
       - key: DATABASE_URL
         fromService:
-          type: psql
+          type: postgres
           name: uptime-db
           property: connectionString
       - key: PYTHON_VERSION
