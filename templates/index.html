@@ -3,7 +3,7 @@
 {% block content %}
 <header class="hero-header">
     <h1>Uptime Monitor</h1>
-    <p class="subtitle">Keep an eye on your web services, effortlessly.</p>
+    <p class="subtitle">A sleek, simple, and free tool to keep an eye on your web services.</p>
 </header>
 
 {% if flash_message %}
@@ -13,9 +13,8 @@
 <div class="flash-message flash-error">{{ flash_error }}</div>
 {% endif %}
 
-<div class="url-form-container interactive-border" style="border-radius: var(--border-radius-pill);">
+<div class="url-form-container interactive-glass">
     <form action="/submit-url" method="post" class="url-form">
-        <i class="fas fa-link form-icon"></i>
         <input type="text" name="url" id="url-input" placeholder="https://example.com" required>
         <button type="submit" id="submit-button" aria-label="Monitor URL">
             <i class="fas fa-plus"></i>
@@ -26,36 +25,44 @@
 <div class="url-list-container">
     {% if urls %}
         {% for url in urls %}
-        <div class="url-card interactive-border">
+        <div class="url-card interactive-glass">
             <div class="url-card-header">
-                <a href="{{ url.url }}" target="_blank" rel="noopener noreferrer" class="url-link">{{ url.url }}</a>
-                {% if url.last_status_code %}
-                    {% if url.last_status_code >= 200 and url.last_status_code < 400 %}
-                        <span class="status-badge status-ok">{{ url.last_status_code }}</span>
+                <div class="url-link-wrapper">
+                    <a href="{{ url.url }}" target="_blank" rel="noopener noreferrer" class="url-link">{{ url.url }}</a>
+                    <p class="last-checked">Last checked: {{ url.last_checked_at.strftime('%b %d, %H:%M') if url.last_checked_at else 'Never' }}</p>
+                </div>
+                <div class="actions">
+                    {% if url.last_status_code %}
+                        <span class="status-badge status-{{ 'ok' if url.last_status_code >= 200 and url.last_status_code < 400 else 'error' }}">{{ url.last_status_code }}</span>
                     {% else %}
-                        <span class="status-badge status-error">{{ url.last_status_code }}</span>
+                        <span class="status-badge status-unknown">Pending</span>
                     {% endif %}
-                {% else %}
-                    <span class="status-badge status-unknown">Pending</span>
-                {% endif %}
+
+                    {% if url.submitted_by_ip == client_ip %}
+                    <form action="{{ url_for('delete_url', url_id=url.id) }}" method="post" onsubmit="return confirm('Are you sure you want to stop monitoring this URL?');" class="delete-form">
+                        <button type="submit" aria-label="Delete URL">
+                            <i class="fas fa-trash-alt delete-icon"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
             </div>
             <div class="url-card-stats">
                 <div class="stat-item">
-                    <strong>Uptime:</strong> <span class="uptime">{{ url.uptime_count }} checks</span>
+                    <strong>Uptime</strong>
+                    <span class="uptime">{{ url.uptime_count }} checks</span>
                 </div>
                 <div class="stat-item">
-                    <strong>Downtime:</strong> <span class="downtime">{{ url.downtime_count }} checks</span>
+                    <strong>Downtime</strong>
+                    <span class="downtime">{{ url.downtime_count }} checks</span>
                 </div>
             </div>
-            <div class="url-card-footer">
-                <span>Last checked: {{ url.last_checked_at.strftime('%Y-%m-%d %H:%M') if url.last_checked_at else 'Never' }}</span>
-                <a href="{{ url_for('read_url_details', url_id=url.id) }}" class="details-link">View Logs →</a>
-            </div>
+            <a href="{{ url_for('read_url_details', url_id=url.id) }}" class="details-link">View Detailed Logs →</a>
         </div>
         {% endfor %}
     {% else %}
-        <div class="empty-state interactive-border">
-            <p>No URLs are being monitored yet. Add one above to get started!</p>
+        <div class="empty-state interactive-glass">
+            <p>No URLs are being monitored. Add one above to get started!</p>
         </div>
     {% endif %}
 </div>
