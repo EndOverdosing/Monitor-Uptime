@@ -30,7 +30,6 @@ async def check_single_url(url_record: models.URL):
         async with httpx.AsyncClient() as client:
             response = await client.get(url_record.url, timeout=10, follow_redirects=True)
             response.raise_for_status()
-            
             response_time = (time.time() - start_time) * 1000
             crud.create_log_and_update_stats(db=db, url_id=url_record.id, is_up=True, status_code=response.status_code, response_time=response_time)
     except httpx.HTTPStatusError as e:
@@ -48,7 +47,6 @@ async def run_all_checks():
         if not urls_to_check:
             print("No URLs to check.")
             return
-        
         tasks = [check_single_url(url) for url in urls_to_check]
         await asyncio.gather(*tasks)
         print(f"Check cycle finished for {len(urls_to_check)} URLs.")
@@ -57,6 +55,7 @@ async def run_all_checks():
 
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request, db: Session = Depends(get_db)):
+    client_ip = request.client.host
     urls = crud.get_all_urls(db)
     flash_message = request.session.pop('flash_message', None)
     flash_error = request.session.pop('flash_error', None)
@@ -64,6 +63,7 @@ def read_root(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("index.html", {
         "request": request,
         "urls": urls,
+        "client_ip": client_ip,
         "flash_message": flash_message,
         "flash_error": flash_error
     })
@@ -84,6 +84,16 @@ async def submit_url(request: Request, url: str = Form(...), db: Session = Depen
         return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
     crud.create_url(db=db, url=url, ip=client_ip)
     request.session['flash_message'] = f"Successfully added {url} for monitoring!"
+    return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
+
+@app.post("/urls/{url_id}/delete", response_class=RedirectResponse)
+def delete_url(request: Request, url_id: int, db: Session = Depends(get_db)):
+    client_ip = request.client.host
+    db_url = crud.delete_url_by_id_and_ip(db=db, url_id=url_id, ip=client_ip)
+    if db_url is None:
+        request.session['flash_error'] = "Could not delete URL. It might not exist or you may not be the owner."
+    else:
+        request.session['flash_message'] = f"Successfully stopped monitoring {db_url.url}. You can now add a new one."
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.get("/urls/{url_id}", response_class=HTMLResponse)
