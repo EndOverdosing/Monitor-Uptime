@@ -23,10 +23,10 @@ services:
     name: uptime-checker-cron
     plan: free
     schedule: "*/5 * * * *"
-    command: "curl -X POST ${WEB_SERVICE_URL}/run-check/${CHECKER_SECRET_TOKEN}"
+    buildCommand: "curl -X POST ${WEB_SERVICE_URL}/run-check/${CHECKER_SECRET_TOKEN}"
     envVars:
       - key: WEB_SERVICE_URL
-        value: "https://uptime-monitor-web.onrender.com/"
+        value: "https://uptime-monitor-web.onrender.com"
       - key: CHECKER_SECRET_TOKEN
         fromService:
           type: web
