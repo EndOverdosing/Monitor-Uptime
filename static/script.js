@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const themeSwitcher = document.getElementById('theme-switcher');
+    
     const savePreference = (key, value) => localStorage.setItem(key, value);
     const getPreference = (key) => localStorage.getItem(key);
 
@@ -19,9 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleMouseMove(e) {
-        const { clientX, clientY } = e;
-        document.body.style.setProperty('--cursor-x', `${clientX}px`);
-        document.body.style.setProperty('--cursor-y', `${clientY}px`);
+        document.body.style.setProperty('--cursor-x', `${e.clientX}px`);
+        document.body.style.setProperty('--cursor-y', `${e.clientY}px`);
         document.body.style.setProperty('--cursor-opacity', '1');
     }
 
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('mousemove', handleMouseMove);
-    document.body.addEventListener('mouseleave', handleMouseLeave);
+    document.addEventListener('mouseleave', handleMouseLeave);
     document.querySelectorAll('.interactive-border').forEach(addInteractiveBorderListeners);
 
     applySavedTheme();
