@@ -1,6 +1,8 @@
 databases:
   - name: uptime-db
     plan: free
+    # Note: Render's free PostgreSQL instances spin down after 15 minutes of inactivity.
+    # For a continuous uptime monitor, consider a paid plan for the database.
 
 services:
   - type: web
