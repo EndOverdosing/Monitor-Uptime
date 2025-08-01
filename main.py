@@ -37,16 +37,19 @@ async def check_single_url(db: Session, url_record: models.URL):
     except httpx.RequestError as e:
         crud.create_log_and_update_stats(db=db, url_id=url_record.id, is_up=False, error=f"Request Error: {type(e).__name__}")
 
-async def run_all_checks(db: Session):
+async def run_all_checks():
+    db = SessionLocal()
     try:
         urls_to_check = crud.get_all_urls(db)
         if not urls_to_check:
             print("No URLs to check.")
             return
+
         tasks = [check_single_url(db, url) for url in urls_to_check]
         await asyncio.gather(*tasks)
         print(f"Check cycle finished for {len(urls_to_check)} URLs.")
     finally:
+
         db.close()
 
 @app.get("/", response_class=HTMLResponse)
@@ -101,10 +104,11 @@ def read_url_details(request: Request, url_id: int, db: Session = Depends(get_db
     return templates.TemplateResponse("details.html", {"request": request, "url": db_url, "logs": logs})
 
 @app.post("/run-check/{secret_token}")
-def trigger_check(secret_token: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+def trigger_check(secret_token: str, background_tasks: BackgroundTasks):
     if not CHECKER_SECRET_TOKEN or secret_token != CHECKER_SECRET_TOKEN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid secret token")
-    background_tasks.add_task(run_all_checks, db)
+
+    background_tasks.add_task(run_all_checks)
     return JSONResponse(content={"message": "Check cycle triggered successfully in the background."})
 
 app.add_middleware(SessionMiddleware, secret_key="a_very_secret_key_change_me_in_production")

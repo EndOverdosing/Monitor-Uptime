@@ -6,33 +6,35 @@ A sleek, simple, and free tool to keep an eye on your web services, built with F
 
 ## Features
 
-- **Simple UI**: A clean, modern interface for monitoring URLs.
-- **Real-time Status**: Shows uptime/downtime counts and the latest HTTP status code.
-- **Detailed Logs**: View a history of checks for each URL with timestamps, status codes, and response times.
-- **IP-Based Ownership**: Users can only add one URL and can only delete the URL they added.
-- **Automatic Checks**: GitHub Actions automatically checks all monitored URLs every 5 minutes.
-- **Easy Deployment**: Deployable to Render with a single `render.yaml` file.
-- **Light/Dark Mode**: Switch themes to your preference.
+-   **Simple UI**: A clean, modern interface for monitoring URLs.
+-   **Real-time Status**: Shows uptime/downtime counts and the latest HTTP status code.
+-   **Detailed Logs**: View a history of checks for each URL with timestamps, status codes, and response times.
+-   **IP-Based Ownership**: Users can only add one URL and can only delete the URL they added.
+-   **Automatic Checks**: GitHub Actions automatically checks all monitored URLs every 5 minutes.
+-   **Easy Deployment**: Deployable to Render with a single `render.yaml` file.
+-   **Light/Dark Mode**: Switch themes to your preference.
 
 ## Tech Stack
 
-- **Backend**: FastAPI, Uvicorn
-- **Database**: PostgreSQL (via SQLAlchemy)
-- **Frontend**: Jinja2 Templates, CSS, JavaScript
-- **HTTP Client**: HTTPX
-- **Deployment**: Render
-- **Automation**: GitHub Actions
+-   **Backend**: FastAPI, Uvicorn
+-   **Database**: PostgreSQL (via SQLAlchemy)
+-   **Frontend**: Jinja2 Templates, CSS, JavaScript
+-   **HTTP Client**: HTTPX
+-   **Deployment**: Render
+-   **Automation**: GitHub Actions
 
 ## Deployment on Render
 
 This project is configured for easy deployment on [Render](https://render.com/) using a "Blueprint" configuration with GitHub Actions for automated checks.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
 ### Step 1: Fork and Deploy
 
 1.  **Fork this Repository**: Click the 'Fork' button at the top-right of this page to create a copy of this repository in your GitHub account.
 
 2.  **Create a New Blueprint on Render**:
-    *   Go to your [Render Dashboard](https://dashboard.render.com/).
+    *   Click the "Deploy to Render" button above, or go to your [Render Dashboard](https://dashboard.render.com/).
     *   Click **New +** and select **Blueprint**.
     *   Connect the GitHub repository you just forked.
     *   Render will automatically detect the `render.yaml` file and propose a plan. Give your service a unique name.
@@ -45,71 +47,87 @@ This project is configured for easy deployment on [Render](https://render.com/) 
 
 Since Render's cron jobs require a paid plan, this project uses GitHub Actions (completely free) to trigger the uptime checks every 5 minutes.
 
-1. **Get your Secret Token**:
-   - After deployment, go to your Render dashboard
-   - Navigate to your `uptime-monitor-web` service
-   - Go to the **Environment** tab
-   - Copy the value of `CHECKER_SECRET_TOKEN`
+1.  **Get your Secret Token**:
+    *   After deployment, go to your Render dashboard
+    *   Navigate to your `uptime-monitor-web` service
+    *   Go to the **Environment** tab
+    *   Copy the value of `CHECKER_SECRET_TOKEN`
 
-2. **Add GitHub Secret**:
-   - In your forked GitHub repository, go to **Settings** → **Secrets and variables** → **Actions**
-   - Click **New repository secret**
-   - Name: `CHECKER_SECRET_TOKEN`
-   - Value: paste the token from Render
-   - Click **Add secret**
+2.  **Add GitHub Secret**:
+    *   In your forked GitHub repository, go to **Settings** → **Secrets and variables** → **Actions**
+    *   Click **New repository secret**
+    *   Name: `CHECKER_SECRET_TOKEN`
+    *   Value: paste the token from Render
+    *   Click **Add secret**
 
-3. **Verify GitHub Actions**:
-   - The `.github/workflows/uptime-check.yml` file is already included in the repository
-   - Go to the **Actions** tab in your GitHub repository
-   - You should see the "Uptime Check" workflow running every 5 minutes
-   - You can also manually trigger it for testing
+3.  **Verify GitHub Actions**:
+    *   The `.github/workflows/uptime-check.yml` file is already included in the repository
+    *   Go to the **Actions** tab in your GitHub repository
+    *   You should see the "Uptime Check" workflow running every 5 minutes
+    *   You can also manually trigger it for testing
 
 ## How It Works
 
 ### Adding a URL
-- The application homepage provides a form to submit a URL for monitoring.
-- To prevent abuse, the system limits monitoring to **one URL per public IP address**.
-- You can only delete a URL if you are accessing the site from the same IP address that submitted it.
+
+-   The application homepage provides a form to submit a URL for monitoring.
+-   To prevent abuse, the system limits monitoring to **one URL per public IP address**.
+-   You can only delete a URL if you are accessing the site from the same IP address that submitted it.
 
 ### Uptime Checking
-- The core checking logic is an async function that sends an HTTP GET request to a URL. It records the status code, response time, and any errors.
-- This logic is triggered by sending a `POST` request to the `/run-check/{secret_token}` endpoint.
-- **GitHub Actions** automatically sends this `POST` request every 5 minutes using the workflow defined in `.github/workflows/uptime-check.yml`, ensuring your monitored URLs are checked consistently.
-- The secret token prevents unauthorized access to the check endpoint.
+
+-   The core checking logic is an async function that sends an HTTP GET request to a URL. It records the status code, response time, and any errors.
+-   This logic is triggered by sending a `POST` request to the `/run-check/{secret_token}` endpoint.
+-   **GitHub Actions** automatically sends this `POST` request every 5 minutes using the workflow defined in `.github/workflows/uptime-check.yml`, ensuring your monitored URLs are checked consistently.
+-   The secret token prevents unauthorized access to the check endpoint.
 
 ## Local Development
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/uptime-monitor.git
-   cd uptime-monitor
-   ```
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/yourusername/uptime-monitor.git
+    cd uptime-monitor
+    ```
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+2.  Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-3. Set environment variables:
-   ```bash
-   export DATABASE_URL="sqlite:///./test.db"
-   export CHECKER_SECRET_TOKEN="your-secret-token"
-   ```
+3.  Set environment variables by creating a `.env` file in the root directory with the following content:
+    ```
+    DATABASE_URL="sqlite:///./test.db"
+    CHECKER_SECRET_TOKEN="my-local-secret"
+    ```
 
-4. Run the application:
-   ```bash
-   uvicorn main:app --reload
-   ```
+4.  Run the application:
+    ```bash
+    uvicorn main:app --reload
+    ```
 
-5. Visit `http://localhost:8000` to use the application.
+5.  Visit `http://localhost:8000` to use the application.
+
+## Testing
+
+The project includes a suite of unit tests to verify the core application logic without making real network requests. These tests use an in-memory database and mock HTTP responses to ensure the functions for checking URLs and logging results work as expected.
+
+1.  Install testing dependencies:
+    ```bash
+    pip install pytest pytest-asyncio
+    ```
+
+2.  Run the tests from the root directory:
+    ```bash
+    pytest -v
+    ```
 
 ## Configuration
 
 The application uses these environment variables:
 
-- `DATABASE_URL`: PostgreSQL connection string (automatically set by Render)
-- `CHECKER_SECRET_TOKEN`: Secret token for triggering checks (automatically generated by Render)
-- `PORT`: Port number for the web service (automatically set by Render)
+-   `DATABASE_URL`: PostgreSQL connection string (automatically set by Render) or a local SQLite connection string.
+-   `CHECKER_SECRET_TOKEN`: Secret token for triggering checks (automatically generated by Render).
+-   `PORT`: Port number for the web service (automatically set by Render).
 
 ## Contributing
 
