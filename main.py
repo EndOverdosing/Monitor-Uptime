@@ -23,12 +23,11 @@ templates = Jinja2Templates(directory="templates")
 
 CHECKER_SECRET_TOKEN = os.getenv("CHECKER_SECRET_TOKEN")
 
-async def check_single_url(url_record: models.URL):
-    db = SessionLocal()
+async def check_single_url(db: Session, url_record: models.URL):
     start_time = time.time()
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url_record.url, timeout=10, follow_redirects=True)
+        async with httpx.AsyncClient(follow_redirects=True, timeout=10) as client:
+            response = await client.get(url_record.url)
             response.raise_for_status()
             response_time = (time.time() - start_time) * 1000
             crud.create_log_and_update_stats(db=db, url_id=url_record.id, is_up=True, status_code=response.status_code, response_time=response_time)
@@ -37,17 +36,14 @@ async def check_single_url(url_record: models.URL):
         crud.create_log_and_update_stats(db=db, url_id=url_record.id, is_up=False, status_code=e.response.status_code, response_time=response_time, error=f"HTTP Error: {e.response.status_code}")
     except httpx.RequestError as e:
         crud.create_log_and_update_stats(db=db, url_id=url_record.id, is_up=False, error=f"Request Error: {type(e).__name__}")
-    finally:
-        db.close()
 
-async def run_all_checks():
-    db = SessionLocal()
+async def run_all_checks(db: Session):
     try:
         urls_to_check = crud.get_all_urls(db)
         if not urls_to_check:
             print("No URLs to check.")
             return
-        tasks = [check_single_url(url) for url in urls_to_check]
+        tasks = [check_single_url(db, url) for url in urls_to_check]
         await asyncio.gather(*tasks)
         print(f"Check cycle finished for {len(urls_to_check)} URLs.")
     finally:
@@ -59,7 +55,7 @@ def read_root(request: Request, db: Session = Depends(get_db)):
     urls = crud.get_all_urls(db)
     flash_message = request.session.pop('flash_message', None)
     flash_error = request.session.pop('flash_error', None)
-    
+
     return templates.TemplateResponse("index.html", {
         "request": request,
         "urls": urls,
@@ -105,10 +101,10 @@ def read_url_details(request: Request, url_id: int, db: Session = Depends(get_db
     return templates.TemplateResponse("details.html", {"request": request, "url": db_url, "logs": logs})
 
 @app.post("/run-check/{secret_token}")
-def trigger_check(secret_token: str, background_tasks: BackgroundTasks):
+def trigger_check(secret_token: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     if not CHECKER_SECRET_TOKEN or secret_token != CHECKER_SECRET_TOKEN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid secret token")
-    background_tasks.add_task(run_all_checks)
+    background_tasks.add_task(run_all_checks, db)
     return JSONResponse(content={"message": "Check cycle triggered successfully in the background."})
 
 app.add_middleware(SessionMiddleware, secret_key="a_very_secret_key_change_me_in_production")
